@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace TranslateOCR
 {
 	public partial class ScreenCapture : Form
 	{
-		Point sourcePoint = new Point();
-		Point destinationPoint = new Point();
-		bool drawing = false;
+		private Point _sourcePoint = new Point();
+		private Point _destinationPoint = new Point();
+		private bool _isDrawing = false;
 
 		public ScreenCapture()
 		{
@@ -21,33 +18,36 @@ namespace TranslateOCR
 			WindowState = FormWindowState.Maximized;
 			Opacity = 0.25;
 
-			this.MouseDown += new MouseEventHandler(this.Canvas_MouseDown);
-			this.MouseUp += new MouseEventHandler(this.Canvas_MouseUp);
-			//this.MouseMove += new MouseEventHandler(this.Canvas_MouseMove);
+			MouseDown += new MouseEventHandler(this.Canvas_MouseDown);
+			MouseUp += new MouseEventHandler(this.Canvas_MouseUp);
+			Paint += new PaintEventHandler(this.Canvas_Paint);
+			MouseMove += new MouseEventHandler(this.Canvas_MouseMove);
+			DoubleBuffered = true;
 		}
 
 		public void Canvas_MouseDown(object sender, MouseEventArgs e)
 		{
-			drawing = true;
-			sourcePoint = new Point(e.X, e.Y);
+			if (!_isDrawing)
+			{
+				_isDrawing = true;
+				_sourcePoint = new Point(e.X, e.Y);
+				_destinationPoint = new Point(e.X, e.Y);
+
+				Canvas_Repaint();
+			}
 		}
 
 		public void Canvas_MouseUp(object sender, MouseEventArgs e)
 		{
-			drawing = false;
-			destinationPoint = new Point(e.X, e.Y);
+			_isDrawing = false;
+			_destinationPoint = new Point(e.X, e.Y);
 
-			Size size = new Size()
-			{
-				Width = Math.Abs(sourcePoint.X - destinationPoint.X),
-				Height = Math.Abs(sourcePoint.Y - destinationPoint.Y)
-			};
-			Rectangle captureArea = new Rectangle(sourcePoint, size);
+			Rectangle captureArea = GetCaptureArea();
 			Bitmap bitmap = new Bitmap(captureArea.Width, captureArea.Height);
 
 			using (Graphics graphics = Graphics.FromImage(bitmap))
 			{
-				this.Close();
+				Close();
 				graphics.CopyFromScreen(captureArea.Location, Point.Empty, captureArea.Size, CopyPixelOperation.SourceCopy);
 				TranslateOCR parentForm = (TranslateOCR)Application.OpenForms["TranslateOCR"];
 				parentForm.pictureBox1.Image = bitmap;
@@ -56,10 +56,46 @@ namespace TranslateOCR
 
 		public void Canvas_MouseMove(object sender, MouseEventArgs e)
 		{
-			if (!drawing)
+			if (_isDrawing)
 			{
-				destinationPoint = new Point(e.X, e.Y);
+				_destinationPoint = new Point(e.X, e.Y);
 			}
+		}
+
+		public void Canvas_Paint(object sender, PaintEventArgs e)
+		{
+			Rectangle captureArea = GetCaptureArea();
+			SolidBrush brush = new SolidBrush(Color.Red);
+
+			e.Graphics.FillRectangle(brush, captureArea);
+		}
+
+		private void Canvas_Repaint()
+		{
+			Task.Run(() =>
+			{
+				while (_isDrawing)
+				{
+					Invalidate();
+				}
+			});
+		}
+
+		private Rectangle GetCaptureArea()
+		{
+			Size size = new Size()
+			{
+				Width = Math.Abs(_sourcePoint.X - _destinationPoint.X),
+				Height = Math.Abs(_sourcePoint.Y - _destinationPoint.Y)
+			};
+
+			Point point = new Point()
+			{
+				X = Math.Min(_sourcePoint.X, _destinationPoint.X),
+				Y = Math.Min(_sourcePoint.Y, _destinationPoint.Y)
+			};
+
+			return new Rectangle(point, size);
 		}
 	}
 }
