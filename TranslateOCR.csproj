@@ -6,10 +6,4 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="TranslateOCR - Copy.resx">
-      <DependentUpon>TranslateOCR.resx</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-
 </Project>

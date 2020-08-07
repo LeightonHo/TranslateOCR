@@ -41,9 +41,9 @@ namespace TranslateOCR
 		private void Capture_Click(object sender, System.EventArgs e)
 		{
             // Allow user to drag a rectangle on the screen.
-            Rectangle rect = Screen.GetBounds(Point.Empty);
-
-            string str = string.Empty;
+            ScreenCapture screenCapture = new ScreenCapture();
+            
+            screenCapture.Show();
 		}
 	}
 }
