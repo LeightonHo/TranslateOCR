@@ -50,12 +50,10 @@ namespace TranslateOCR
 			using (Graphics graphics = Graphics.FromImage(bitmap))
 			{
 				Close();
+
 				graphics.CopyFromScreen(captureArea.Location, Point.Empty, captureArea.Size, CopyPixelOperation.SourceCopy);
 				TranslateOCR parentForm = (TranslateOCR)Application.OpenForms["TranslateOCR"];
-				parentForm.pictureBox1.Image = bitmap;
-				parentForm.screenCapture = bitmap;
-
-				bitmap.Save("test.tiff", System.Drawing.Imaging.ImageFormat.Tiff);
+				parentForm.ProcessImage(bitmap);
 			}
 		}
 

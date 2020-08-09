@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Windows.Forms;
 using Tesseract;
 
@@ -12,8 +13,6 @@ namespace TranslateOCR
 		public TranslateOCR()
 		{
 			InitializeComponent();
-
-            ProcessImage();
 
             this.components = new System.ComponentModel.Container();
 
@@ -43,24 +42,55 @@ namespace TranslateOCR
 
 		private void Capture_Click(object sender, System.EventArgs e)
 		{
-            // Allow user to drag a rectangle on the screen.
+            // Open form to allow user to select a portion of the screen.
             ScreenCapture screenCapture = new ScreenCapture();
             
             screenCapture.Show();
 		}
 
-        public void ProcessImage()
+        public void ProcessImage(Bitmap bitmap)
         {
-            using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+            picCapture.Image = bitmap;
+            screenSnippet = bitmap;
+
+            string filename = SaveBitmapToDisk(bitmap);
+
+            using (var engine = new TesseractEngine(@"./tessdata", GetSelectedLanguage(), EngineMode.Default))
             {
-                using (Pix img = Pix.LoadFromFile("./phototest.tif"))
+                using (Pix img = Pix.LoadFromFile(filename))
                 {
                     using (Page page = engine.Process(img))
                     {
-                        string text = page.GetText();
+                        textBox1.Text = page.GetText();
 					}
 				}
 			}
 		}
+
+        private string SaveBitmapToDisk(Bitmap bitmap)
+        {
+            string filename = $"temp_{DateTime.Now.ToString("yyyyMMddHHmmss")}.tif";
+
+            bitmap.Save(filename, System.Drawing.Imaging.ImageFormat.Tiff);
+
+            return filename;
+        }
+
+        private string GetSelectedLanguage()
+        {
+            string language = cboLanguage.SelectedItem.ToString();
+
+            switch (language.ToUpper().Trim())
+            {
+                case "ENGLISH":
+                    return "eng";
+                case "CHINESE (TRADITIONAL)":
+                    return "chi_tra";
+                case "CHINESE (SIMPLIFIED)":
+                    return "chi_sim";
+                default:
+                    return "eng";
+            }
+        }
 	}
 }
