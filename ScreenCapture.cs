@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Tesseract;
 
 namespace TranslateOCR
 {
@@ -51,6 +53,9 @@ namespace TranslateOCR
 				graphics.CopyFromScreen(captureArea.Location, Point.Empty, captureArea.Size, CopyPixelOperation.SourceCopy);
 				TranslateOCR parentForm = (TranslateOCR)Application.OpenForms["TranslateOCR"];
 				parentForm.pictureBox1.Image = bitmap;
+				parentForm.screenCapture = bitmap;
+
+				bitmap.Save("test.tiff", System.Drawing.Imaging.ImageFormat.Tiff);
 			}
 		}
 

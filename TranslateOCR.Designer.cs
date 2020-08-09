@@ -1,4 +1,6 @@
-﻿namespace TranslateOCR
+﻿using System.Drawing;
+
+namespace TranslateOCR
 {
 	partial class TranslateOCR
 	{
@@ -46,7 +48,7 @@
 			// 
 			this.pictureBox1.Location = new System.Drawing.Point(21, 68);
 			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(492, 199);
+			this.pictureBox1.Size = new System.Drawing.Size(739, 132);
 			this.pictureBox1.TabIndex = 1;
 			this.pictureBox1.TabStop = false;
 			// 
@@ -67,7 +69,9 @@
 		#endregion
 
 		private System.Windows.Forms.Button Capture;
-		public System.Windows.Forms.PictureBox pictureBox1;
+
+		public System.Windows.Forms.PictureBox pictureBox1 = null;
+		public Bitmap screenCapture = null;
 	}
 }
 

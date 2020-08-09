@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
+using Tesseract;
 
 namespace TranslateOCR
 {
@@ -12,6 +13,8 @@ namespace TranslateOCR
 		{
 			InitializeComponent();
 
+            ProcessImage();
+
             this.components = new System.ComponentModel.Container();
 
             // Set up how the form should be displayed.
@@ -23,7 +26,7 @@ namespace TranslateOCR
 
             // The Icon property sets the icon that will appear
             // in the systray for this application.
-            notifyIcon.Icon = new Icon("language.ico");
+            notifyIcon.Icon = new Icon("./Assets/language.ico");
 
             // The ContextMenu property sets the menu that will
             // appear when the systray icon is right clicked.
@@ -44,6 +47,20 @@ namespace TranslateOCR
             ScreenCapture screenCapture = new ScreenCapture();
             
             screenCapture.Show();
+		}
+
+        public void ProcessImage()
+        {
+            using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
+            {
+                using (Pix img = Pix.LoadFromFile("./phototest.tif"))
+                {
+                    using (Page page = engine.Process(img))
+                    {
+                        string text = page.GetText();
+					}
+				}
+			}
 		}
 	}
 }
