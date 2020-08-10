@@ -2,15 +2,14 @@
 using System.Drawing;
 using System.Windows.Forms;
 using Tesseract;
-using System.Collections.Generic;
 
 namespace TranslateOCR
 {
-    public partial class TranslateOCR : Form
+	public partial class TranslateOCR : Form
 	{
 		private System.ComponentModel.IContainer components = null;
         private NotifyIcon notifyIcon;
-        private List<ScreenCapture> screenCaptureList = new List<ScreenCapture>();
+        private ScreenCapture screenCaptureForm;
 
 		public TranslateOCR()
 		{
@@ -43,47 +42,36 @@ namespace TranslateOCR
             //notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
         }
 
-        private void InitializeScreenCaptureForms()
-        {
-            foreach (Screen screen in Screen.AllScreens)
-            {
-                ScreenCapture screenCapture = new ScreenCapture();
-
-                screenCapture.Location = screen.WorkingArea.Location;
-                screenCapture.StartPosition = FormStartPosition.Manual;
-
-                screenCaptureList.Add(screenCapture);
-            }
-        }
-
 		private void Capture_Click(object sender, System.EventArgs e)
 		{
+            int screenHeight = 0;
+            int screenWidth = 0;
+
             // Open form to allow user to select a portion of the screen.
             foreach (Screen screen in Screen.AllScreens)
             {
-                ScreenCapture screenCapture = new ScreenCapture()
-                {
-                    Location = screen.WorkingArea.Location,
-                    StartPosition = FormStartPosition.Manual,
-                    FormBorderStyle = FormBorderStyle.None,
-                    WindowState = FormWindowState.Maximized,
-                    Opacity = 0.25,
-                    TopLeftPoint = screen.WorkingArea.Location
-                };
-
-                screenCapture.Show();
-                screenCaptureList.Add(screenCapture);
+                screenHeight = (screen.Bounds.Height >= screenHeight ? screen.Bounds.Height : screenHeight);
+                screenWidth += screen.Bounds.Width;
             }
-		}
+
+            screenCaptureForm = new ScreenCapture()
+            {
+                Location = new Point(0, 0),
+                StartPosition = FormStartPosition.Manual,
+                Size = new Size(screenWidth, screenHeight),
+                FormBorderStyle = FormBorderStyle.None,
+                Opacity = 0.25,
+                TopLeftPoint = new Point(0, 0)
+            };
+
+            screenCaptureForm.Show();
+        }
 
         public void HideScreenCaptureForms()
         {
-            foreach (ScreenCapture screenCapture in screenCaptureList)
-            {
-                screenCapture.Close();
-			}
+            screenCaptureForm.Close();
 
-            screenCaptureList = new List<ScreenCapture>();
+            screenCaptureForm = null;
 		}
 
         public void ProcessImage(Bitmap bitmap)
