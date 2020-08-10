@@ -57,13 +57,13 @@ namespace TranslateOCR
             screenCaptureForm = new ScreenCapture()
             {
                 Location = new Point(0, 0),
-                StartPosition = FormStartPosition.Manual,
                 Size = new Size(screenWidth, screenHeight),
+                StartPosition = FormStartPosition.Manual,
                 FormBorderStyle = FormBorderStyle.None,
-                Opacity = 0.25,
                 TopLeftPoint = new Point(0, 0)
             };
 
+            screenCaptureForm.Initialize();
             screenCaptureForm.Show();
         }
 

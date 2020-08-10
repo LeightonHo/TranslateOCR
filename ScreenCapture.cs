@@ -23,6 +23,11 @@ namespace TranslateOCR
 			DoubleBuffered = true;
 		}
 
+		public void Initialize()
+		{
+			SetBackgroundImage();
+		}
+
 		private void Canvas_MouseDown(object sender, MouseEventArgs e)
 		{
 			if (!_isDrawing)
@@ -47,8 +52,8 @@ namespace TranslateOCR
 			{
 				TranslateOCR parentForm = (TranslateOCR)Application.OpenForms["TranslateOCR"];
 
-				parentForm.HideScreenCaptureForms();
 				graphics.CopyFromScreen(captureArea.Location, Point.Empty, captureArea.Size, CopyPixelOperation.SourceCopy);
+				parentForm.HideScreenCaptureForms();
 				parentForm.ProcessImage(bitmap);
 			}
 		}
@@ -64,9 +69,12 @@ namespace TranslateOCR
 		private void Canvas_Paint(object sender, PaintEventArgs e)
 		{
 			Rectangle captureArea = GetCaptureArea(false);
-			SolidBrush brush = new SolidBrush(Color.Red);
+			Pen pen = new Pen(Color.Red, 2)
+			{
+				Alignment = System.Drawing.Drawing2D.PenAlignment.Inset
+			};
 
-			e.Graphics.FillRectangle(brush, captureArea);
+			e.Graphics.DrawRectangle(pen, captureArea);
 		}
 
 		private void Canvas_Repaint()
@@ -110,6 +118,19 @@ namespace TranslateOCR
 				X = point.X + TopLeftPoint.X,
 				Y = point.Y + TopLeftPoint.Y
 			};
+		}
+
+		private void SetBackgroundImage()
+		{
+			Rectangle screenArea = new Rectangle(0, 0, Width, Height);
+			Bitmap bitmap = new Bitmap(screenArea.Width, screenArea.Height);
+
+			using (Graphics graphics = Graphics.FromImage(bitmap))
+			{
+				graphics.CopyFromScreen(screenArea.Location, Point.Empty, screenArea.Size, CopyPixelOperation.SourceCopy);
+
+				BackgroundImage = bitmap;
+			}
 		}
 
 		#region Public methods
