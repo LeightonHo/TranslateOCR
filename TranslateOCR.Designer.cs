@@ -60,20 +60,20 @@ namespace TranslateOCR
 			this.textBox1.Location = new System.Drawing.Point(21, 267);
 			this.textBox1.Multiline = true;
 			this.textBox1.Name = "textBox1";
-			this.textBox1.Size = new System.Drawing.Size(756, 100);
+			this.textBox1.Size = new System.Drawing.Size(756, 154);
 			this.textBox1.TabIndex = 2;
 			// 
 			// cboLanguage
 			// 
 			this.cboLanguage.FormattingEnabled = true;
+			this.cboLanguage.Items.AddRange(new object[] {
+            "English",
+            "Chinese (Traditional)",
+            "Chinese (Simplified)"});
 			this.cboLanguage.Location = new System.Drawing.Point(86, 225);
 			this.cboLanguage.Name = "cboLanguage";
 			this.cboLanguage.Size = new System.Drawing.Size(158, 23);
 			this.cboLanguage.TabIndex = 3;
-			this.cboLanguage.Items.Add("English");
-			this.cboLanguage.Items.Add("Chinese (Traditional)");
-			this.cboLanguage.Items.Add("Chinese (Simplified)");
-			this.cboLanguage.SelectedIndex = 0;
 			// 
 			// lblLanguage
 			// 

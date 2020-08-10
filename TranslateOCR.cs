@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using Tesseract;
+using System.Collections.Generic;
 
 namespace TranslateOCR
 {
@@ -9,11 +10,13 @@ namespace TranslateOCR
 	{
 		private System.ComponentModel.IContainer components = null;
         private NotifyIcon notifyIcon;
+        private List<ScreenCapture> screenCaptureList = new List<ScreenCapture>();
 
 		public TranslateOCR()
 		{
 			InitializeComponent();
 
+            this.cboLanguage.SelectedIndex = 0;
             this.components = new System.ComponentModel.Container();
 
             // Set up how the form should be displayed.
@@ -40,12 +43,47 @@ namespace TranslateOCR
             //notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
         }
 
+        private void InitializeScreenCaptureForms()
+        {
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                ScreenCapture screenCapture = new ScreenCapture();
+
+                screenCapture.Location = screen.WorkingArea.Location;
+                screenCapture.StartPosition = FormStartPosition.Manual;
+
+                screenCaptureList.Add(screenCapture);
+            }
+        }
+
 		private void Capture_Click(object sender, System.EventArgs e)
 		{
             // Open form to allow user to select a portion of the screen.
-            ScreenCapture screenCapture = new ScreenCapture();
-            
-            screenCapture.Show();
+            foreach (Screen screen in Screen.AllScreens)
+            {
+                ScreenCapture screenCapture = new ScreenCapture()
+                {
+                    Location = screen.WorkingArea.Location,
+                    StartPosition = FormStartPosition.Manual,
+                    FormBorderStyle = FormBorderStyle.None,
+                    WindowState = FormWindowState.Maximized,
+                    Opacity = 0.25,
+                    TopLeftPoint = screen.WorkingArea.Location
+                };
+
+                screenCapture.Show();
+                screenCaptureList.Add(screenCapture);
+            }
+		}
+
+        public void HideScreenCaptureForms()
+        {
+            foreach (ScreenCapture screenCapture in screenCaptureList)
+            {
+                screenCapture.Close();
+			}
+
+            screenCaptureList = new List<ScreenCapture>();
 		}
 
         public void ProcessImage(Bitmap bitmap)
@@ -65,11 +103,12 @@ namespace TranslateOCR
 					}
 				}
 			}
+
 		}
 
         private string SaveBitmapToDisk(Bitmap bitmap)
         {
-            string filename = $"temp_{DateTime.Now.ToString("yyyyMMddHHmmss")}.tif";
+            string filename = $"capture_{DateTime.Now.ToString("yyyyMMddHHmmss")}.tif";
 
             bitmap.Save(filename, System.Drawing.Imaging.ImageFormat.Tiff);
 
