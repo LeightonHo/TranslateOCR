@@ -74,6 +74,8 @@ namespace TranslateOCR
 			this.cboLanguage.Name = "cboLanguage";
 			this.cboLanguage.Size = new System.Drawing.Size(158, 23);
 			this.cboLanguage.TabIndex = 3;
+			this.cboLanguage.SelectedIndexChanged += new System.EventHandler(cboLanguage_SelectedIndexChanged);
+
 			// 
 			// lblLanguage
 			// 
@@ -108,7 +110,6 @@ namespace TranslateOCR
 		private System.Windows.Forms.Button btnCapture;
 		private System.Windows.Forms.PictureBox pbo = null;
 
-		public Bitmap screenSnippet = null;
 		private System.Windows.Forms.ComboBox cboLanguage;
 		private System.Windows.Forms.Label lblLanguage;
 		private System.Windows.Forms.PictureBox Ca;

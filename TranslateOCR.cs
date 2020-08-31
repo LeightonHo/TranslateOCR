@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
+using System.Threading;
 using System.Windows.Forms;
+using System.Windows.Forms.Design;
 using Tesseract;
 
 namespace TranslateOCR
 {
 	public partial class TranslateOCR : Form
 	{
-		private System.ComponentModel.IContainer components = null;
+        public Bitmap ScreenSnippet { get; set; } = null;
+        private string Filename { get; set; } = null;
+        private System.ComponentModel.IContainer components = null;
         private NotifyIcon notifyIcon;
         private ScreenCapture screenCaptureForm;
 
@@ -42,8 +47,16 @@ namespace TranslateOCR
             //notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
         }
 
-		private void Capture_Click(object sender, System.EventArgs e)
+		private void Capture_Click(object sender, EventArgs e)
 		{
+            Cleanup();
+
+            // Hide the form before the screenshot is taken.
+            WindowState = FormWindowState.Minimized;
+
+			// Wait 200ms for the minimize animation.
+			Thread.Sleep(300);
+
             int screenHeight = 0;
             int screenWidth = 0;
 
@@ -65,25 +78,31 @@ namespace TranslateOCR
 
             screenCaptureForm.Initialize();
             screenCaptureForm.Show();
+            screenCaptureForm.Activate();
         }
 
-        public void HideScreenCaptureForms()
+        private void cboLanguage_SelectedIndexChanged(object sender, EventArgs e)
         {
-            screenCaptureForm.Close();
+            ProcessImage();
+        }
 
-            screenCaptureForm = null;
-		}
-
-        public void ProcessImage(Bitmap bitmap)
+        public void ProcessImage()
         {
-            picCapture.Image = bitmap;
-            screenSnippet = bitmap;
+            if (ScreenSnippet == null)
+            {
+                return;
+			}
 
-            string filename = SaveBitmapToDisk(bitmap);
+            picCapture.Image = ScreenSnippet;
+
+            if (string.IsNullOrEmpty(Filename))
+            {
+                Filename = SaveBitmapToDisk(ScreenSnippet);
+			}
 
             using (var engine = new TesseractEngine(@"./tessdata", GetSelectedLanguage(), EngineMode.Default))
             {
-                using (Pix img = Pix.LoadFromFile(filename))
+                using (Pix img = Pix.LoadFromFile(Filename))
                 {
                     using (Page page = engine.Process(img))
                     {
@@ -91,7 +110,6 @@ namespace TranslateOCR
 					}
 				}
 			}
-
 		}
 
         private string SaveBitmapToDisk(Bitmap bitmap)
@@ -102,6 +120,18 @@ namespace TranslateOCR
 
             return filename;
         }
+
+        private void Cleanup()
+        {
+            string path = $"{Directory.GetCurrentDirectory()}/{Filename}";
+
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+			}
+
+            Filename = string.Empty;
+		}
 
         private string GetSelectedLanguage()
         {

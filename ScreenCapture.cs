@@ -20,6 +20,7 @@ namespace TranslateOCR
 			MouseUp += new MouseEventHandler(this.Canvas_MouseUp);
 			Paint += new PaintEventHandler(this.Canvas_Paint);
 			MouseMove += new MouseEventHandler(this.Canvas_MouseMove);
+			KeyDown += new KeyEventHandler(this.Canvas_KeyDown);
 			DoubleBuffered = true;
 		}
 
@@ -53,8 +54,11 @@ namespace TranslateOCR
 				TranslateOCR parentForm = (TranslateOCR)Application.OpenForms["TranslateOCR"];
 
 				graphics.CopyFromScreen(captureArea.Location, Point.Empty, captureArea.Size, CopyPixelOperation.SourceCopy);
-				parentForm.HideScreenCaptureForms();
-				parentForm.ProcessImage(bitmap);
+
+				Close();
+				parentForm.ScreenSnippet = bitmap;
+				parentForm.ProcessImage();
+				parentForm.WindowState = FormWindowState.Normal;
 			}
 		}
 
@@ -63,6 +67,14 @@ namespace TranslateOCR
 			if (_isDrawing)
 			{
 				_destinationPoint = GetPointOnScreen(e.Location);
+			}
+		}
+
+		private void Canvas_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Escape)
+			{
+				Close();
 			}
 		}
 
