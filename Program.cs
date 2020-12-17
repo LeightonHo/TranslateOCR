@@ -17,7 +17,8 @@ namespace TranslateOCR
 			Application.SetHighDpiMode(HighDpiMode.SystemAware);
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new TranslateOCR());
+			new TranslateOCR();
+			Application.Run();
 		}
 	}
 }

@@ -3,7 +3,6 @@ using System.Drawing;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
 using Tesseract;
 
 namespace TranslateOCR
@@ -14,25 +13,31 @@ namespace TranslateOCR
         private string Filename { get; set; } = null;
         private System.ComponentModel.IContainer components = null;
         private NotifyIcon notifyIcon;
+        private ContextMenuStrip contextMenuStrip;
         private ScreenCapture screenCaptureForm;
 
 		public TranslateOCR()
 		{
 			InitializeComponent();
 
-            this.cboLanguage.SelectedIndex = 0;
-            this.components = new System.ComponentModel.Container();
+            cboLanguage.SelectedIndex = 0;
+            components = new System.ComponentModel.Container();
 
             // Set up how the form should be displayed.
-            this.Hide();
-            this.Text = "Translate OCR";
+            Hide();
+            Text = "Translate OCR";
 
             // Create the NotifyIcon.
-            this.notifyIcon = new NotifyIcon(this.components);
+            notifyIcon = new NotifyIcon(components);
 
             // The Icon property sets the icon that will appear
             // in the systray for this application.
             notifyIcon.Icon = new Icon("./Assets/language.ico");
+
+            contextMenuStrip = new ContextMenuStrip();
+            contextMenuStrip.Items.Add("Capture", null, new EventHandler(Capture_Click));
+
+            notifyIcon.ContextMenuStrip = contextMenuStrip;
 
             // The ContextMenu property sets the menu that will
             // appear when the systray icon is right clicked.
